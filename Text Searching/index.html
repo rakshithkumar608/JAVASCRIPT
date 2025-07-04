@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Highlight Matching Item</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
+    <style>
+        .highlight {
+            background-color: #ffff99;
+        }
+        .list-group-item {
+            transition: all 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <input type="text" id="searchInput" class="form-control" placeholder="Search...">
+        <ul id="itemList" class="list-group mt-3">
+            <li class="list-group-item">Afghanistan</li>
+            <li class="list-group-item">Bangladesh</li>
+            <li class="list-group-item">Canada</li>
+            <li class="list-group-item">China</li>
+            <li class="list-group-item">Denmark</li>
+            <li class="list-group-item">Egypt</li>
+            <li class="list-group-item">France</li>
+            <li class="list-group-item">Germany</li>
+            <li class="list-group-item">Haiti</li>
+            <li class="list-group-item">India</li>
+            <li class="list-group-item">Japan</li>
+            <li class="list-group-item">Korea</li>
+            <li class="list-group-item">Liberia</li>
+            <li class="list-group-item">Mexico</li>
+            <li class="list-group-item">New Zealand</li>
+            <li class="list-group-item">Oman</li>
+            <li class="list-group-item">Philippines</li>
+            <li class="list-group-item">Qatar</li>
+            <li class="list-group-item">Russia</li>
+            <li class="list-group-item">Singapore</li>
+            <li class="list-group-item">Sri Lanka</li>
+            <li class="list-group-item">Thailand</li>
+            <li class="list-group-item">United Arab Emirates</li>
+            <li class="list-group-item">Venezuela</li>
+            <li class="list-group-item">Württemberg</li>
+            <li class="list-group-item">Yemen</li>
+            <li class="list-group-item">Zimbabwe</li>
+        </ul>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase().trim();
+            const itemList = document.getElementById('itemList');
+            const items = Array.from(itemList.getElementsByClassName('list-group-item'));
+            
+            // Store original text content if not already stored
+            items.forEach(item => {
+                if (!item.dataset.original) {
+                    item.dataset.original = item.textContent;
+                }
+            });
+
+            // Create arrays for matching and non-matching items
+            const matchingItems = [];
+            const nonMatchingItems = [];
+
+            items.forEach(item => {
+                const originalText = item.dataset.original;
+                const lowerText = originalText.toLowerCase();
+                
+                // Reset to original text
+                item.innerHTML = originalText;
+
+                if (searchTerm && lowerText.includes(searchTerm)) {
+                    // Find all occurrences of search term and wrap in span
+                    const regex = new RegExp(`(${searchTerm})`, 'gi');
+                    const highlightedText = originalText.replace(regex, '<span class="highlight">$1</span>');
+                    item.innerHTML = highlightedText;
+                    matchingItems.push(item);
+                } else {
+                    nonMatchingItems.push(item);
+                }
+            });
+
+            // Reorder list: matching items first, then non-matching
+            const allItems = [...matchingItems, ...nonMatchingItems];
+            allItems.forEach(item => itemList.appendChild(item));
+        });
+    </script>
+</body>
+</html>
