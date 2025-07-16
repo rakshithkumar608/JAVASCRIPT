@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskMaster Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --primary: #4F46E5;
+            --secondary: #10B981;
+            --danger: #EF4444;
+            --dark: #1F2937;
+            --light: #F3F4F6;
+        }
+
+        .dark {
+            --primary: #6366F1;
+            --secondary: #34D399;
+            --danger: #F87171;
+            --dark: #F3F4F6;
+            --light: #1F2937;
+        }
+
+        body {
+            background-color: var(--light);
+            color: var(--dark);
+            transition: all 0.3s ease;
+        }
+
+        .dark body {
+            background-color: #111827;
+        }
+
+        .task-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .task-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .category-work {
+            background-color: #E0E7FF;
+            color: #4F46E5;
+        }
+
+        .category-personal {
+            background-color: #D1FAE5;
+            color: #065F46;
+        }
+
+        .category-shopping {
+            background-color: #FEF3C7;
+            color: #92400E;
+        }
+
+        .category-other {
+            background-color: #E5E7EB;
+            color: #1F2937;
+        }
+
+        .dark .category-work {
+            background-color: #3730A3;
+            color: #E0E7FF;
+        }
+
+        .dark .category-personal {
+            background-color: #064E3B;
+            color: #D1FAE5;
+        }
+
+        .dark .category-shopping {
+            background-color: #92400E;
+            color: #FEF3C7;
+        }
+
+        .dark .category-other {
+            background-color: #4B5563;
+            color: #E5E7EB;
+        }
+
+        .checkbox:checked + .checkmark {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .checkbox:checked + .checkmark:after {
+            display: block;
+        }
+
+        .checkmark:after {
+            content: "";
+            position: absolute;
+            display: none;
+            left: 5px;
+            top: 1px;
+            width: 5px;
+            height: 10px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-4xl">
+        <!-- Header -->
+        <header class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900 dark:text-white">TaskMaster Pro</h1>
+                <p class="text-gray-600 dark:text-gray-400">Your productivity companion</p>
+            </div>
+            <button id="theme-toggle" class="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path id="theme-icon" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+            </button>
+        </header>
+
+        <!-- Add Task Form -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8">
+            <h2 class="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Add New Task</h2>
+            <form id="task-form" class="space-y-4">
+                <div>
+                    <label for="task-title" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Task Title</label>
+                    <input type="text" id="task-title" class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white" placeholder="What needs to be done?" required>
+                </div>
+                
+                <div>
+                    <label for="task-category" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Category</label>
+                    <select id="task-category" class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
+                        <option value="work">Work</option>
+                        <option value="personal">Personal</option>
+                        <option value="shopping">Shopping</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <input id="important-task" type="checkbox" class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                        <label for="important-task" class="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300">Mark as important</label>
+                    </div>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition">Add Task</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Task Filters -->
+        <div class="flex flex-wrap gap-2 mb-6">
+            <button data-filter="all" class="filter-btn active px-4 py-2 bg-blue-600 text-white rounded-lg">All Tasks</button>
+            <button data-filter="work" class="filter-btn px-4 py-2 bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100 rounded-lg">Work</button>
+            <button data-filter="personal" class="filter-btn px-4 py-2 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100 rounded-lg">Personal</button>
+            <button data-filter="shopping" class="filter-btn px-4 py-2 bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100 rounded-lg">Shopping</button>
+            <button data-filter="other" class="filter-btn px-4 py-2 bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-100 rounded-lg">Other</button>
+            <button data-filter="important" class="filter-btn px-4 py-2 bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100 rounded-lg">Important</button>
+        </div>
+
+        <!-- Task Stats -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 mb-6">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Tasks:</span>
+                    <span id="total-tasks" class="text-sm font-bold text-gray-700 dark:text-gray-300">0</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Completed:</span>
+                    <span id="completed-tasks" class="text-sm font-bold text-green-600 dark:text-green-400">0</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Important:</span>
+                    <span id="important-tasks" class="text-sm font-bold text-red-600 dark:text-red-400">0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Task List -->
+        <div id="task-list" class="space-y-4">
+            <!-- Sample task - will be populated by JavaScript -->
+            <div class="task-card hidden bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 border-l-4 border-blue-500">
+                <div class="flex items-start justify-between">
+                    <div class="flex items-start space-x-3 flex-1">
+                        <label class="inline-flex items-center mt-1">
+                            <input type="checkbox" class="checkbox hidden">
+                            <span class="checkmark w-5 h-5 border-2 rounded border-gray-300 dark:border-gray-500 inline-block relative"></span>
+                        </label>
+                        <div class="flex-1">
+                            <h3 class="font-medium text-gray-900 dark:text-white">Sample Task</h3>
+                            <div class="flex items-center mt-1 space-x-2">
+                                <span class="category-work text-xs px-2 py-1 rounded-full">Work</span>
+                                <span class="text-xs text-gray-500 dark:text-gray-400">Today</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="delete-btn text-gray-400 hover:text-red-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const taskForm = document.getElementById('task-form');
+        const taskTitle = document.getElementById('task-title');
+        const taskCategory = document.getElementById('task-category');
+        const importantTask = document.getElementById('important-task');
+        const taskList = document.getElementById('task-list');
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        
+        // Statistics elements
+        const totalTasksEl = document.getElementById('total-tasks');
+        const completedTasksEl = document.getElementById('completed-tasks');
+        const importantTasksEl = document.getElementById('important-tasks');
+        
+        // State
+        let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+        let currentFilter = 'all';
+        
+        // Initialize the app
+        function init() {
+            renderTasks();
+            updateStats();
+            setupEventListeners();
+            checkThemePreference();
+        }
+        
+        // Set up event listeners
+        function setupEventListeners() {
+            taskForm.addEventListener('submit', addTask);
+            
+            filterButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    currentFilter = button.dataset.filter;
+                    renderTasks();
+                });
+            });
+            
+            themeToggle.addEventListener('click', toggleTheme);
+        }
+        
+        // Add a new task
+        function addTask(e) {
+            e.preventDefault();
+            
+            const title = taskTitle.value.trim();
+            if (!title) return;
+            
+            const newTask = {
+                id: Date.now().toString(),
+                title,
+                category: taskCategory.value,
+                important: importantTask.checked,
+                completed: false,
+                createdAt: new Date().toISOString()
+            };
+            
+            tasks.unshift(newTask);
+            saveTasks();
+            renderTasks();
+            updateStats();
+            
+            // Reset form
+            taskTitle.value = '';
+            importantTask.checked = false;
+            taskTitle.focus();
+        }
+        
+        // Render tasks based on current filter
+        function renderTasks() {
+            taskList.innerHTML = '';
+            
+            let filteredTasks = tasks;
+            
+            if (currentFilter !== 'all') {
+                filteredTasks = tasks.filter(task => {
+                    if (currentFilter === 'important') return task.important;
+                    return task.category === currentFilter;
+                });
+            }
+            
+            if (filteredTasks.length === 0) {
+                taskList.innerHTML = `
+                    <div class="text-center py-8 text-gray-500 dark:text-gray-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-4 text-gray-300 dark:text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                        </svg>
+                        <p>No tasks found</p>
+                        ${currentFilter !== 'all' ? `<p class="text-sm">Try changing the filter</p>` : ''}
+                    </div>
+                `;
+                return;
+            }
+            
+            filteredTasks.forEach(task => {
+                const taskElement = document.createElement('div');
+                taskElement.className = `task-card bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 fade-in ${task.important ? 'border-l-4 border-red-500' : 'border-l-4 border-blue-500'}`;
+                
+                const date = new Date(task.createdAt);
+                const formattedDate = formatDate(date);
+                
+                taskElement.innerHTML = `
+                    <div class="flex items-start justify-between">
+                        <div class="flex items-start space-x-3 flex-1">
+                            <label class="inline-flex items-center mt-1">
+                                <input type="checkbox" class="checkbox hidden" ${task.completed ? 'checked' : ''} data-id="${task.id}">
+                                <span class="checkmark w-5 h-5 border-2 rounded ${task.completed ? 'bg-blue-500 border-blue-500' : 'border-gray-300 dark:border-gray-500'} inline-block relative"></span>
+                            </label>
+                            <div class="flex-1">
+                                <h3 class="font-medium ${task.completed ? 'line-through text-gray-400 dark:text-gray-500' : 'text-gray-900 dark:text-white'}">${task.title}</h3>
+                                <div class="flex items-center mt-1 space-x-2">
+                                    <span class="category-${task.category} text-xs px-2 py-1 rounded-full">${capitalizeFirstLetter(task.category)}</span>
+                                    <span class="text-xs text-gray-500 dark:text-gray-400">${formattedDate}</span>
+                                    ${task.important ? '<span class="text-xs px-2 py-1 rounded-full bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100">Important</span>' : ''}
+                                </div>
+                            </div>
+                        </div>
+                        <button class="delete-btn text-gray-400 hover:text-red-500" data-id="${task.id}">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                        </button>
+                    </div>
+                `;
+                
+                taskList.appendChild(taskElement);
+                
+                // Add event listeners to the new elements
+                const checkbox = taskElement.querySelector('.checkbox');
+                const deleteBtn = taskElement.querySelector('.delete-btn');
+                
+                checkbox.addEventListener('change', toggleTaskStatus);
+                deleteBtn.addEventListener('click', deleteTask);
+            });
+        }
+        
+        // Toggle task completion status
+        function toggleTaskStatus(e) {
+            const taskId = e.target.dataset.id;
+            const task = tasks.find(task => task.id === taskId);
+            task.completed = e.target.checked;
+            saveTasks();
+            renderTasks();
+            updateStats();
+        }
+        
+        // Delete a task
+        function deleteTask(e) {
+            const taskId = e.currentTarget.dataset.id;
+            tasks = tasks.filter(task => task.id !== taskId);
+            saveTasks();
+            renderTasks();
+            updateStats();
+        }
+        
+        // Update statistics
+        function updateStats() {
+            totalTasksEl.textContent = tasks.length;
+            
+            const completedCount = tasks.filter(task => task.completed).length;
+            completedTasksEl.textContent = completedCount;
+            
+            const importantCount = tasks.filter(task => task.important).length;
+            importantTasksEl.textContent = importantCount;
+        }
+        
+        // Save tasks to localStorage
+        function saveTasks() {
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+        }
+        
+        // Format date
+        function formatDate(date) {
+            const now = new Date();
+            const diffInDays = Math.floor((now - date) / (1000 * 60 * 60 * 24));
+            
+            if (diffInDays === 0) return 'Today';
+            if (diffInDays === 1) return 'Yesterday';
+            if (diffInDays < 7) return `${diffInDays} days ago`;
+            
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        }
+        
+        // Capitalize first letter
+        function capitalizeFirstLetter(string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
+        
+        // Theme functions
+        function checkThemePreference() {
+            if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+                themeIcon.setAttribute('d', 'M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z');
+            } else {
+                document.documentElement.classList.remove('dark');
+                themeIcon.setAttribute('d', 'M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z');
+            }
+        }
+        
+        function toggleTheme() {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+                themeIcon.setAttribute('d', 'M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z');
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+                themeIcon.setAttribute('d', 'M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z');
+            }
+        }
+        
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
